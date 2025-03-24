@@ -9,7 +9,7 @@
 uint16_t          axis_reading[JOYSTICK_AXIS_COUNT];
 joystick_config_t joystick_axes[JOYSTICK_AXIS_COUNT] = {
     JOYSTICK_AXIS_IN(GP29, 1023, 520, 3),
-    JOYSTICK_AXIS_IN(GP28, 1023, 520, 3),
+    JOYSTICK_AXIS_IN(GP28, 3, 520, 1023),
 };
 
 typedef union {
@@ -22,8 +22,8 @@ typedef union {
 kb_config_t kb_config;
 
 void keyboard_post_init_kb(void) {
-    debug_enable = true;
-    debug_matrix = true;
+    // debug_enable = true;
+    // debug_matrix = true;
 
     kb_config.raw = eeconfig_read_kb();
     keyboard_post_init_user();
@@ -144,9 +144,9 @@ void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
             return;
         } else {
             // Left = 1, Right = 2, Up = 0, Down = 3
-            if (axis_reading[0] < (joystick_axes[0].mid_digit - DEADZONE_RANGE)) {
+            if (axis_reading[0] > (joystick_axes[0].mid_digit + DEADZONE_RANGE)) {
                 current_row_value |= 1 << 1;
-            } else if (axis_reading[0] > (joystick_axes[0].mid_digit + DEADZONE_RANGE)) {
+            } else if (axis_reading[0] < (joystick_axes[0].mid_digit - DEADZONE_RANGE)) {
                 current_row_value |= 1 << 2;
             }
 
