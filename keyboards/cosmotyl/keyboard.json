@@ -10,7 +10,10 @@
     "features": {
         "bootmagic": true,
         "console": true,
-        "rgb_matrix": true
+        "rgb_matrix": true,
+        "extrakey": true,
+        "mousekey": true,
+        "nkro": true
     },
     "matrix_pins": {
         "cols": ["GP25", "GP24", "GP23", "GP22", "GP21", "GP20", "GP10"],
