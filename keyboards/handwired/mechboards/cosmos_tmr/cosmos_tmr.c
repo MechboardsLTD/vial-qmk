@@ -12,33 +12,40 @@ joystick_config_t joystick_axes[JOYSTICK_AXIS_COUNT] = {
     JOYSTICK_AXIS_IN(GP29, 835, 490, 145),
 };
 
-#define DEADZONE_5PCT 35
-// set max deadzone to 45%
-#define DEADZONE_MAX (DEADZONE_5PCT * 9)
+#define DEADZONE_1PCT 3.5
+#define DEADZONE_MAX 45
 
 typedef union {
     uint32_t raw;
     struct {
         bool joystick_analog_mode : 1;
-        uint16_t deadzone;
+        uint8_t deadzone_percent;
     };
 } kb_config_t;
 
 kb_config_t kb_config;
+
+uint8_t deadzone_value = 0;
+
+void update_deadzone_value(void){
+    deadzone_value = (uint8_t)((float)kb_config.deadzone_percent * DEADZONE_1PCT);
+}
 
 void keyboard_post_init_kb(void) {
     // debug_enable = true;
     // debug_matrix = true;
 
     kb_config.raw = eeconfig_read_kb();
+    update_deadzone_value();
     keyboard_post_init_user();
 };
 
 void eeconfig_init_user(void) {
     kb_config.raw                  = 0;
     kb_config.joystick_analog_mode = true; // Joystick analog mode by default.
-    kb_config.deadzone = DEADZONE_5PCT*2;
+    kb_config.deadzone_percent = 1;
     eeconfig_update_kb(kb_config.raw);     // Write default value to EEPROM now
+    update_deadzone_value();
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -72,47 +79,52 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case DEAD_UP:
             if (record->event.pressed) {
-                kb_config.deadzone = kb_config.deadzone + DEADZONE_5PCT;
-                if (kb_config.deadzone > DEADZONE_MAX) {
-                    kb_config.deadzone = DEADZONE_MAX;
+                kb_config.deadzone_percent = kb_config.deadzone_percent + 1;
+                if (kb_config.deadzone_percent > DEADZONE_MAX) {
+                    kb_config.deadzone_percent = DEADZONE_MAX;
                 }
                 eeconfig_update_kb(kb_config.raw);
+                update_deadzone_value();
             }
             return false;
         case DEAD_DW:
             if (record->event.pressed) {
-                int16_t deadzone = kb_config.deadzone;
-                deadzone = deadzone - DEADZONE_5PCT;
+                int16_t deadzone = kb_config.deadzone_percent;
+                deadzone = deadzone - 1;
                 if (deadzone < 0) {
-                    kb_config.deadzone = 0;
+                    kb_config.deadzone_percent = 0;
                 } else {
-                    kb_config.deadzone = deadzone;
+                    kb_config.deadzone_percent = deadzone;
                 }
                 eeconfig_update_kb(kb_config.raw);
+                update_deadzone_value();
             }
             return false;
         case DEAD_0:
             if (record->event.pressed) {
-                kb_config.deadzone = 0;
+                kb_config.deadzone_percent = 0;
                 eeconfig_update_kb(kb_config.raw);
+                update_deadzone_value();
             }
             return false;
         case DEAD_10:
             if (record->event.pressed) {
-                kb_config.deadzone = DEADZONE_5PCT * 2;
+                kb_config.deadzone_percent = 10;
                 eeconfig_update_kb(kb_config.raw);
+                update_deadzone_value();
             }
             return false;
         case DEAD_25:
             if (record->event.pressed) {
-                kb_config.deadzone = DEADZONE_5PCT * 5;
+                kb_config.deadzone_percent = 25;
                 eeconfig_update_kb(kb_config.raw);
+                update_deadzone_value();
             }
             return false;
         case DEAD_PRT:
             if (record->event.pressed) {
                 char buffer[50];
-                sprintf(buffer, "Deadzone %u%%\n", (uint8_t)(((float)kb_config.deadzone/700.0)*100));
+                sprintf(buffer, "Deadzone %u%%\n", (uint8_t)(((float)kb_config.deadzone_percent)));
                 send_string_with_delay_P(buffer, 5);
             }
             return false;
@@ -138,7 +150,7 @@ uint16_t joystick_axis_sample(uint8_t axis) {
 
     if (kb_config.joystick_analog_mode){
 
-        if (axis_reading[axis] > (joystick_axes[axis].mid_digit + kb_config.deadzone) || axis_reading[axis] < (joystick_axes[axis].mid_digit - kb_config.deadzone)){
+        if (axis_reading[axis] > (joystick_axes[axis].mid_digit + deadzone_value) || axis_reading[axis] < (joystick_axes[axis].mid_digit - deadzone_value)){
             return axis_reading[axis];
         } else {
             return joystick_axes[axis].mid_digit;
@@ -203,15 +215,15 @@ void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
             return;
         } else {
             // Left = 1, Right = 2, Up = 0, Down = 3
-            if (axis_reading[0] > (joystick_axes[0].mid_digit + kb_config.deadzone)) {
+            if (axis_reading[0] > (joystick_axes[0].mid_digit + deadzone_value)) {
                 current_row_value |= 1 << 3;
-            } else if (axis_reading[0] < (joystick_axes[0].mid_digit - kb_config.deadzone)) {
+            } else if (axis_reading[0] < (joystick_axes[0].mid_digit - deadzone_value)) {
                 current_row_value |= 1 << 0;
             }
 
-            if (axis_reading[1] < (joystick_axes[1].mid_digit - kb_config.deadzone)) {
+            if (axis_reading[1] < (joystick_axes[1].mid_digit - deadzone_value)) {
                 current_row_value |= 1 << 1;
-            } else if (axis_reading[1] > (joystick_axes[1].mid_digit + kb_config.deadzone)) {
+            } else if (axis_reading[1] > (joystick_axes[1].mid_digit + deadzone_value)) {
                 current_row_value |= 1 << 2;
             }
         }
