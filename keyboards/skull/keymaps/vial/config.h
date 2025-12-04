@@ -1,0 +1,7 @@
+#pragma once
+
+#define SPLIT_TRANSACTION_IDS_USER USER_SYNC_A
+
+#define VIAL_KEYBOARD_UID {0x1A, 0x12, 0x08, 0x45, 0xAD, 0xF5, 0x13, 0x49}
+#define VIAL_UNLOCK_COMBO_ROWS { 0, 0 }
+#define VIAL_UNLOCK_COMBO_COLS { 0, 1 }
