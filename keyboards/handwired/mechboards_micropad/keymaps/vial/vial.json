@@ -1,0 +1,17 @@
+{
+    "lighting": "none",
+    "matrix": {
+        "rows": 0,
+        "cols": 4
+    },
+    "layouts": {
+        "keymap": [
+            [
+                "0,0",
+                "0,1",
+                "0,2",
+                "0,3"
+            ]
+        ]
+    }
+}
