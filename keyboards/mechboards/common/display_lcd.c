@@ -27,6 +27,52 @@ static deferred_token display_task_token;
 #define LCD_HEIGHT 240
 #define LCD_WIDTH 135
 
+//----------------------------------------------------------
+// RGB Matrix naming
+#undef RGB_MATRIX_EFFECT
+#ifdef RGB_MATRIX_MODE_NAME_ENABLE
+const char *rgb_matrix_get_mode_name(uint8_t mode) {
+    switch (mode) {
+        case RGB_MATRIX_NONE:
+            return "NONE";
+
+#    define RGB_MATRIX_EFFECT(name, ...) \
+        case RGB_MATRIX_##name:          \
+            return #name;
+#    include "rgb_matrix_effects.inc"
+#    undef RGB_MATRIX_EFFECT
+
+#    ifdef COMMUNITY_MODULES_ENABLE
+#        define RGB_MATRIX_EFFECT(name, ...)         \
+            case RGB_MATRIX_COMMUNITY_MODULE_##name: \
+                return #name;
+#        include "rgb_matrix_community_modules.inc"
+#        undef RGB_MATRIX_EFFECT
+#    endif // COMMUNITY_MODULES_ENABLE
+
+#    if defined(RGB_MATRIX_CUSTOM_KB) || defined(RGB_MATRIX_CUSTOM_USER)
+#        define RGB_MATRIX_EFFECT(name, ...) \
+            case RGB_MATRIX_CUSTOM_##name:   \
+                return #name;
+
+#        ifdef RGB_MATRIX_CUSTOM_KB
+#            include "rgb_matrix_kb.inc"
+#        endif // RGB_MATRIX_CUSTOM_KB
+
+#        ifdef RGB_MATRIX_CUSTOM_USER
+#            include "rgb_matrix_user.inc"
+#        endif // RGB_MATRIX_CUSTOM_USER
+
+#        undef RGB_MATRIX_EFFECT
+#    endif // RGB_MATRIX_CUSTOM_KB || RGB_MATRIX_CUSTOM_USER
+
+        default:
+            return "UNKNOWN";
+    }
+}
+#    undef RGB_MATRIX_EFFECT
+#endif // RGB_MATRIX_MODE_NAME_ENABLE
+
 void drawtext_right_recolor(painter_device_t device, uint16_t y, uint8_t width, painter_font_handle_t font, const char *str, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg) {
     qp_drawtext_recolor(lcd, width - qp_textwidth(font, str), y, font, str, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
 }
@@ -314,6 +360,7 @@ void display_task_kb(void) {
 
         currlay = get_highest_layer(layer_state);
         if (currlay != lastlay) {
+            lastlay = currlay;
             draw_layers();
         }
 

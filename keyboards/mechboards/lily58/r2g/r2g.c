@@ -9,8 +9,8 @@ void keyboard_post_init_kb(void) {
     keyboard_post_init_user();
 }
 
-const pin_t row_pins_left[MATRIX_ROWS_PER_HAND]  = MATRIX_ROW_PINS;
-const pin_t row_pins_right[MATRIX_ROWS_PER_HAND] = MATRIX_ROW_PINS_RIGHT;
+const pin_t row_pins_left[MATRIX_ROWS/2]  = MATRIX_ROW_PINS;
+const pin_t row_pins_right[MATRIX_ROWS/2] = MATRIX_ROW_PINS_RIGHT;
 const pin_t col_pins_left[MATRIX_COLS]  = MATRIX_COL_PINS;
 const pin_t col_pins_right[MATRIX_COLS] = MATRIX_COL_PINS_RIGHT;
 
