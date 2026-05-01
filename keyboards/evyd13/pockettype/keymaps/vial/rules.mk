@@ -1,0 +1,3 @@
+VIA_ENABLE = yes
+VIAL_ENABLE = yes
+CONVERT_TO = rp2040_ce
