@@ -3,16 +3,15 @@
 A ready 2 go Sofle PCB with VIK support.
 
 * Keyboard Maintainer: [dasky](https://github.com/daskygit)
-* Hardware Supported: Controllers using promicro footprint.
 * Hardware Availability: https://mechboards.co.uk
 
 Make example for this keyboard (after setting up your build environment):
 
-    qmk compile -kb mechboards/sofle/r2g -km default
+    qmk compile -kb mechboards/sofle/r2g -km vial
 
 Flashing example for this keyboard:
 
-    qmk flash -kb mechboards/sofle/r2g -km default
+    qmk flash -kb mechboards/sofle/r2g -km vial
 
 See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_tools) and the [make instructions](https://docs.qmk.fm/#/getting_started_make_guide) for more information. Brand new to QMK? Start with our [Complete Newbs Guide](https://docs.qmk.fm/#/newbs).
 
@@ -21,5 +20,5 @@ See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_to
 Enter the bootloader in 3 ways:
 
 * **Bootmagic reset**: Hold down the top left key (for left half) or top right key (for right half) when plugging in USB.
-* **Physical reset button**: Briefly double press the button below the TRRS socket.
+* **Boot button**: Hold down the silver coloured button on the bottom of the PCB and when plugging in the USB.
 * **Keycode in layout**: Press the key mapped to `QK_BOOT` if it is available
