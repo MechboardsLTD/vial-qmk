@@ -188,7 +188,6 @@ void wpm_layer_display_init(void) {
     draw_layers();
     draw_wpm_text();
     draw_wpm_chart_2(true);
-    qp_flush(surface);
 }
 
 void draw_bar(uint8_t value, uint8_t max_value, uint8_t left, uint8_t top, uint8_t max_length, uint8_t height) {
