@@ -14,18 +14,21 @@
 #define WPM_CHART_WIDTH 135
 #define WPM_CHART_HEIGHT 70
 
+#define LCD_HEIGHT 240
+#define LCD_WIDTH 135
+
+
 painter_device_t      lcd;
 painter_font_handle_t pixellari_18;
 painter_font_handle_t pixellari_24;
 
-static hsv_t mb = {129, 189, 181};
+static hsv_t ui_hsv = {129, 189, 181};
+static hsv_t last_hsv = {0, 0, 255};
 
 int vals = 20;
 
 static deferred_token display_task_token;
 
-#define LCD_HEIGHT 240
-#define LCD_WIDTH 135
 
 //----------------------------------------------------------
 // RGB Matrix naming
@@ -87,7 +90,7 @@ void drawtext_centered(painter_device_t device, uint16_t x, uint16_t y, uint8_t 
 
 void drawtext_layer(uint16_t x, uint16_t y, uint8_t width, const char *str, uint8_t layer) {
     if (layer == get_highest_layer(layer_state)) {
-        drawtext_centered_recolor(lcd, x, y, width, pixellari_24, str, 255, 0, 255, mb.h, mb.s, mb.v);
+        drawtext_centered_recolor(lcd, x, y, width, pixellari_24, str, 255, 0, 255, ui_hsv.h, ui_hsv.s, ui_hsv.v);
     } else {
         drawtext_centered_recolor(lcd, x, y, width, pixellari_24, str, 255, 0, 255, 0, 0, 0);
     }
@@ -128,7 +131,7 @@ void draw_os(bool init) {
             break;
     }
     qp_rect(lcd, 0, 220, LCD_WIDTH-1, 220+pixellari_18->line_height, 0, 0, 0, true);
-    drawtext_centered_recolor(lcd, 0, 220, 135, pixellari_18, os_name, mb.h, mb.s, mb.v, 0, 0, 0);
+    drawtext_centered_recolor(lcd, 0, 220, 135, pixellari_18, os_name, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
 }
 
 void draw_wpm_text(void) {
@@ -151,7 +154,7 @@ void wpm_chart_write_value(uint8_t value) {
     wpm_chart.values[wpm_chart.start] = value;
     uint8_t scaled_value              = scale8(WPM_CHART_HEIGHT, wpm_chart.values[wpm_chart.start]);
     qp_line(lcd, wpm_chart.start, LCD_HEIGHT - 1 - 60, wpm_chart.start, (LCD_HEIGHT - 1 - 60) - WPM_CHART_HEIGHT, 0, 0, 0);
-    qp_line(lcd, wpm_chart.start, LCD_HEIGHT - 1 - 60, wpm_chart.start, (LCD_HEIGHT - 1 - 60) - scaled_value, mb.h, mb.s, mb.v);
+    qp_line(lcd, wpm_chart.start, LCD_HEIGHT - 1 - 60, wpm_chart.start, (LCD_HEIGHT - 1 - 60) - scaled_value, ui_hsv.h, ui_hsv.s, ui_hsv.v);
     wpm_chart_next();
 }
 
@@ -168,7 +171,7 @@ void wpm_chart_init(void) {
 //     for (uint8_t i = 0; i < WPM_CHART_WIDTH; i++) {
 //         uint8_t location     = (wpm_chart.start + i) % WPM_CHART_WIDTH;
 //         uint8_t scaled_value = scale8(WPM_CHART_HEIGHT, wpm_chart.values[location]);
-//         qp_line(lcd, i, LCD_HEIGHT - 1 - 10, i, (LCD_HEIGHT - 1 - 10) - scaled_value, mb.h, mb.s, mb.v);
+//         qp_line(lcd, i, LCD_HEIGHT - 1 - 10, i, (LCD_HEIGHT - 1 - 10) - scaled_value, ui_hsv.h, ui_hsv.s, ui_hsv.v);
 //     }
 // }
 
@@ -189,8 +192,8 @@ void wpm_layer_display_init(void) {
 void draw_bar(uint8_t value, uint8_t max_value, uint8_t left, uint8_t top, uint8_t max_length, uint8_t height) {
     uint8_t bar_length = (((max_length << 8) / max_value) * value) >> 8;
     qp_rect(lcd, left, top, left + max_length, top + height, 0, 0, 0, true);
-    qp_rect(lcd, left, top, left + max_length, top + height, mb.h, mb.s, mb.v, false);
-    qp_rect(lcd, left, top, left + bar_length, top + height, mb.h, mb.s, mb.v, true);
+    qp_rect(lcd, left, top, left + max_length, top + height, ui_hsv.h, ui_hsv.s, ui_hsv.v, false);
+    qp_rect(lcd, left, top, left + bar_length, top + height, ui_hsv.h, ui_hsv.s, ui_hsv.v, true);
 }
 
 void draw_rgb_text(bool init) {
@@ -206,11 +209,11 @@ void draw_rgb_text(bool init) {
 
     qp_rect(lcd, LCD_WIDTH / 2, 110, LCD_WIDTH - 1, 110 + pixellari_18->line_height, 0, 0, 0, true);
     snprintf(buffer, sizeof(buffer), "%d", rgb_matrix_get_hue());
-    drawtext_right_recolor(lcd, 110, LCD_WIDTH, pixellari_18, buffer, mb.h, mb.s, mb.v, 0, 0, 0);
+    drawtext_right_recolor(lcd, 110, LCD_WIDTH, pixellari_18, buffer, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
     // snprintf(buffer, sizeof(buffer), "%d",rgb_matrix_get_sat());
-    // drawtext_right_recolor(lcd, 130, LCD_WIDTH, pixellari_18, buffer, mb.h, mb.s, mb.v, 0, 0, 0);
+    // drawtext_right_recolor(lcd, 130, LCD_WIDTH, pixellari_18, buffer, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
     // snprintf(buffer, sizeof(buffer), "%d",rgb_matrix_get_val());
-    // drawtext_right_recolor(lcd, 150, LCD_WIDTH, pixellari_18, buffer, mb.h, mb.s, mb.v, 0, 0, 0);
+    // drawtext_right_recolor(lcd, 150, LCD_WIDTH, pixellari_18, buffer, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
 
     draw_bar(rgb_matrix_get_sat(), 255, 45, 130, LCD_WIDTH - 1 - 45, pixellari_18->line_height);
     draw_bar(rgb_matrix_get_val(), RGB_MATRIX_MAXIMUM_BRIGHTNESS, 45, 150, LCD_WIDTH - 1 - 45, pixellari_18->line_height);
@@ -240,12 +243,12 @@ void draw_rgb_text(bool init) {
         }
 
         qp_rect(lcd, 0, 30, LCD_WIDTH - 1, 80 + pixellari_18->line_height, 0, 0, 0, true);
-        drawtext_centered_recolor(lcd, 0, 40, 135, pixellari_18, &mode_name[0], mb.h, mb.s, mb.v, 0, 0, 0);
+        drawtext_centered_recolor(lcd, 0, 40, 135, pixellari_18, &mode_name[0], ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
         if (underscore_loc[0] > 0) {
-            drawtext_centered_recolor(lcd, 0, 60, 135, pixellari_18, &mode_name[underscore_loc[0] + 1], mb.h, mb.s, mb.v, 0, 0, 0);
+            drawtext_centered_recolor(lcd, 0, 60, 135, pixellari_18, &mode_name[underscore_loc[0] + 1], ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
         }
         if (underscore_loc[1] > 0) {
-            drawtext_centered_recolor(lcd, 0, 80, 135, pixellari_18, &mode_name[underscore_loc[1] + 1], mb.h, mb.s, mb.v, 0, 0, 0);
+            drawtext_centered_recolor(lcd, 0, 80, 135, pixellari_18, &mode_name[underscore_loc[1] + 1], ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
         }
         free(mode_name);
     }
@@ -290,6 +293,15 @@ __attribute__((weak)) bool display_init_user(void) {
     return true;
 }
 
+void display_ui_init(void) {
+    if (is_keyboard_left()) {
+        wpm_layer_display_init();
+        draw_os(true);
+    } else {
+        rgb_bl_display_init();
+    }
+}
+
 void display_init_kb(void) {
     // Initialise the LCD
     lcd = qp_st7789_make_spi_device(LCD_WIDTH, LCD_HEIGHT, VIK_CS, VIK_GPIO1, VIK_GPIO2, 4, 3);
@@ -302,13 +314,12 @@ void display_init_kb(void) {
         return;
     }
 
-    if (is_keyboard_left()) {
-        wpm_layer_display_init();
-        draw_os(true);
+    last_hsv.h = rgb_matrix_get_hue();
+    last_hsv.s = rgb_matrix_get_sat();
 
-    } else {
-        rgb_bl_display_init();
-    }
+    ui_hsv = last_hsv;
+
+    display_ui_init();
 
     display_task_token = defer_exec(2000, display_task_callback, NULL);
 }
@@ -320,6 +331,13 @@ __attribute__((weak)) bool display_task_user(void) {
 void display_task_kb(void) {
     if (!display_task_user()) {
         return;
+    }
+
+    if (last_hsv.h != rgb_matrix_get_hue() || last_hsv.s != rgb_matrix_get_sat()) {
+        last_hsv.h = rgb_matrix_get_hue();
+        last_hsv.s = rgb_matrix_get_sat();
+        ui_hsv      = last_hsv;
+        display_ui_init();
     }
 
     if (is_keyboard_master()) {
