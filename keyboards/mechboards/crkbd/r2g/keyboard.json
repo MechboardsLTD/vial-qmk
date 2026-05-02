@@ -10,7 +10,7 @@
     },
     "bootloader": "rp2040",
     "bootmagic": {
-        "matrix": [0, 4]
+        "matrix": [0, 1]
     },
     "build": {
         "lto": true
@@ -34,7 +34,6 @@
         "wpm": true
     },
     "matrix_pins": {
-        //"cols": ["GP3", "GP21", "GP23", "GP25", "GP19", "GP4"],
         "cols": ["GP4", "GP19", "GP25", "GP23", "GP21", "GP3"],
         "rows": ["GP24", "GP22", "GP20", "GP2"]
     },
