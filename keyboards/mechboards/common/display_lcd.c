@@ -127,6 +127,7 @@ void draw_os(bool init) {
             os_name = "Unsure";
             break;
     }
+    qp_rect(lcd, 0, 220, LCD_WIDTH-1, 220+pixellari_18->line_height, 0, 0, 0, true);
     drawtext_centered_recolor(lcd, 0, 220, 135, pixellari_18, os_name, mb.h, mb.s, mb.v, 0, 0, 0);
 }
 
@@ -368,6 +369,7 @@ void display_task_kb(void) {
 
         if (detected_host_os() != last_os) {
             draw_os(false);
+            last_os = detected_host_os();
         }
 
     } else {
