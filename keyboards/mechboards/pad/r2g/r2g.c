@@ -8,3 +8,7 @@ void keyboard_post_init_kb(void) {
     display_init_kb();
     keyboard_post_init_user();
 }
+
+painter_rotation_t get_display_rotation(void) {
+    return QP_ROTATION_180;
+}
