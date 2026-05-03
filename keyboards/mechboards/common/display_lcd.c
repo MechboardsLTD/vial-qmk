@@ -298,10 +298,14 @@ void display_ui_init(void) {
     }
 }
 
+__attribute__((weak)) painter_rotation_t get_display_rotation(void) {
+    return QP_ROTATION_0;
+}
+
 void display_init_kb(void) {
     // Initialise the surface
     lcd = qp_st7789_make_spi_device(LCD_WIDTH, LCD_HEIGHT, VIK_CS, VIK_GPIO1, VIK_GPIO2, 4, 3);
-    qp_init(lcd, QP_ROTATION_0);
+    qp_init(lcd, get_display_rotation());
     qp_set_viewport_offsets(surface, 52, 40);
     surface = qp_make_rgb565_surface(LCD_WIDTH, LCD_HEIGHT, surface_buffer);
     qp_init(surface, QP_ROTATION_0);
