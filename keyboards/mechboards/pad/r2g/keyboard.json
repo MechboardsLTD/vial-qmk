@@ -2,16 +2,24 @@
     "manufacturer": "Mechboards",
     "keyboard_name": "Pad R2G",
     "maintainer": "dasky",
+    "backlight": {
+        "driver": "pwm",
+        "levels": 10,
+        "on_state": 0,
+        "pin": "GP9"
+    },
     "bootloader": "rp2040",
     "build": {
         "lto": true
     },
     "features": {
+        "backlight": true,
         "bootmagic": true,
         "extrakey": true,
         "mousekey": true,
         "os_detection": true,
-        "rgb_matrix": true
+        "rgb_matrix": true,
+        "wpm": true
     },
     "matrix_pins": {
         "direct":[
