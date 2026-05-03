@@ -3,7 +3,6 @@
 
 #include <printf.h>
 #include <ctype.h>
-#include "transactions.h"
 #include "qp_font/pixellari18.qff.h"
 #include "qp_font/pixellari24.qff.h"
 #include "display_lcd.h"
@@ -26,8 +25,6 @@ painter_font_handle_t pixellari_24;
 
 static hsv_t ui_hsv = {129, 189, 181};
 static hsv_t last_hsv = {0, 0, 255};
-
-int vals = 20;
 
 static deferred_token display_task_token __attribute__((used));
 
@@ -128,7 +125,7 @@ void draw_os(bool init) {
         case OS_LINUX:
             os_name = "Linux";
             break;
-        case OS_UNSURE:
+        default:
             os_name = "Unsure";
             break;
     }
