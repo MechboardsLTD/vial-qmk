@@ -3,6 +3,7 @@
 
 #include <printf.h>
 #include <ctype.h>
+#include "qp.h"
 #include "qp_font/pixellari18.qff.h"
 #include "qp_font/pixellari24.qff.h"
 #include "display_lcd.h"
@@ -307,6 +308,7 @@ void display_init_kb(void) {
     lcd = qp_st7789_make_spi_device(LCD_WIDTH, LCD_HEIGHT, VIK_CS, VIK_GPIO1, VIK_GPIO2, 4, 3);
     qp_init(lcd, get_display_rotation());
     qp_set_viewport_offsets(surface, 52, 40);
+    qp_rect(lcd,0,0,LCD_WIDTH-1,LCD_HEIGHT-1,0,0,0,true);
     surface = qp_make_rgb565_surface(LCD_WIDTH, LCD_HEIGHT, surface_buffer);
     qp_init(surface, QP_ROTATION_0);
     // Load fonts
