@@ -17,6 +17,13 @@
 #define LCD_HEIGHT 240
 #define LCD_WIDTH 135
 
+#ifndef LCD_OFFSET_X
+#    define LCD_OFFSET_X 52
+#endif
+#ifndef LCD_OFFSET_Y
+#    define LCD_OFFSET_Y 40
+#endif
+
 static uint8_t surface_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(LCD_WIDTH, LCD_HEIGHT, 16)];
 
 painter_device_t      lcd;
@@ -28,7 +35,6 @@ static hsv_t ui_hsv = {129, 189, 181};
 static hsv_t last_hsv = {0, 0, 255};
 
 static deferred_token display_task_token __attribute__((used));
-
 
 //----------------------------------------------------------
 // RGB Matrix naming
@@ -307,8 +313,7 @@ void display_init_kb(void) {
     // Initialise the surface
     lcd = qp_st7789_make_spi_device(LCD_WIDTH, LCD_HEIGHT, VIK_CS, VIK_GPIO1, VIK_GPIO2, 4, 3);
     qp_init(lcd, get_display_rotation());
-    qp_set_viewport_offsets(surface, 52, 40);
-    qp_rect(lcd,0,0,LCD_WIDTH-1,LCD_HEIGHT-1,0,0,0,true);
+    qp_set_viewport_offsets(surface, LCD_OFFSET_X, LCD_OFFSET_Y);
     surface = qp_make_rgb565_surface(LCD_WIDTH, LCD_HEIGHT, surface_buffer);
     qp_init(surface, QP_ROTATION_0);
     // Load fonts
@@ -325,7 +330,7 @@ void display_init_kb(void) {
 
     display_ui_init();
 
-    qp_surface_draw(surface, lcd, 52, 40, false);
+    qp_surface_draw(surface, lcd, LCD_OFFSET_X, LCD_OFFSET_Y, false);
 
     display_task_token = defer_exec(2000, display_task_callback, NULL);
 }
