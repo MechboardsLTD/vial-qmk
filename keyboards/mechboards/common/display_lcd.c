@@ -416,21 +416,3 @@ void display_task_kb(void) {
 
     qp_surface_draw(surface, lcd, 52, 40, false);
 }
-
-// static uint8_t last_backlight = 255;
-
-// void suspend_power_down_kb(void) {
-//     if (last_backlight == 255) {
-//         last_backlight = get_backlight_level();
-//     }
-//     backlight_set(0);
-//     suspend_power_down_user();
-// }
-
-// void suspend_wakeup_init_kb(void) {
-//     if (last_backlight != 255) {
-//         backlight_set(last_backlight);
-//     }
-//     last_backlight = 255;
-//     suspend_wakeup_init_user();
-// }
