@@ -2,7 +2,7 @@
     "lighting": "vialrgb",
     "matrix": {
         "rows": 8,
-        "cols": 6
+        "cols": 5
     },
     "layouts": {
         "labels": ["Left Encoder", "Right Encoder"],
