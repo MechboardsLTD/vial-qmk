@@ -22,7 +22,7 @@
         ]
     },
     "features": {
-        "backlight": true,
+        "backlight": false,
         "bootmagic": true,
         "encoder": true,
         "extrakey": true,
