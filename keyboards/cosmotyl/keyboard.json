@@ -1,7 +1,7 @@
 {
-    "manufacturer": "Cosmos",
-    "keyboard_name": "cosmotyl",
-    "maintainer": "Cosmos",
+    "manufacturer": "Mechboards",
+    "keyboard_name": "Cosmotyl",
+    "maintainer": "Mechboards",
     "bootloader": "rp2040",
     "bootmagic": {
         "matrix": [0, 0]
@@ -114,7 +114,7 @@
             "driver": "vendor"
         }
     },
-    "url": "ryanis.cool/cosmos",
+    "url": "mechboards.co.uk",
     "usb": {
         "device_version": "0.0.1",
         "pid": "0x0001",
