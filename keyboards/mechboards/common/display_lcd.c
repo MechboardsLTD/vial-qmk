@@ -110,6 +110,19 @@ void clear_display(void) {
     qp_rect(surface, 0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1, 0, 0, 0, true);
 }
 
+void draw_lock_indicators(void) {
+    led_t leds = host_keyboard_led_state();
+    uint8_t caps_hue = leds.caps_lock ? ui_hsv.h : 0;
+    uint8_t caps_sat = leds.caps_lock ? ui_hsv.s : 0;
+    uint8_t caps_val = leds.caps_lock ? ui_hsv.v : 80;
+    uint8_t num_hue  = leds.num_lock ? ui_hsv.h : 0;
+    uint8_t num_sat  = leds.num_lock ? ui_hsv.s : 0;
+    uint8_t num_val  = leds.num_lock ? ui_hsv.v : 80;
+
+    drawtext_centered_recolor(surface, 0, 193, 38, pixellari_18, "CAP", caps_hue, caps_sat, caps_val, 0, 0, 0);
+    drawtext_centered_recolor(surface, 97, 193, 38, pixellari_18, "NUM", num_hue, num_sat, num_val, 0, 0, 0);
+}
+
 void draw_layers(void) {
     drawtext_centered(surface, 0, 10, 135, pixellari_24, "LAYER");
     drawtext_layer(0, 45, 32, "1", 0);
@@ -121,6 +134,7 @@ void draw_layers(void) {
 void draw_os(bool init) {
     if (init) {
         drawtext_centered(surface, 0, 190, 135, pixellari_24, "OS");
+        draw_lock_indicators();
     }
     char *os_name;
     switch (detected_host_os()) {
@@ -408,6 +422,7 @@ void display_task_kb(void) {
             if (lastwpm != currwpm) {
                 draw_wpm_text();
             }
+            draw_lock_indicators();
             wpm_chart_write_value(currwpm);
             draw_wpm_chart_2(false);
         }
