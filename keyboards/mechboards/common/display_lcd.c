@@ -7,6 +7,7 @@
 #include "qp_font/pixellari18.qff.h"
 #include "qp_font/pixellari24.qff.h"
 #include "display_lcd.h"
+#include "version.h"
 #include "lib/lib8tion/lib8tion.h"
 #include "rgb_matrix.h"
 #include "backlight/backlight.h"
@@ -16,6 +17,7 @@
 
 #define LCD_HEIGHT 240
 #define LCD_WIDTH 135
+#define LCD_SPLASH_DURATION 7000
 
 #ifndef LCD_OFFSET_X
 #    define LCD_OFFSET_X 52
@@ -35,6 +37,8 @@ static hsv_t ui_hsv = {129, 189, 181};
 static hsv_t last_hsv = {0, 0, 255};
 
 static deferred_token display_task_token __attribute__((used));
+static bool splash_active;
+static uint32_t splash_start;
 
 //----------------------------------------------------------
 // RGB Matrix naming
@@ -305,6 +309,31 @@ void display_ui_init(void) {
     }
 }
 
+void display_splash_init(void) {
+    clear_display();
+    char  keyboard_name[] = PRODUCT;
+    char *name_lines[3]   = {keyboard_name, NULL, NULL};
+    uint8_t line_count    = 1;
+    for (size_t i = 0; keyboard_name[i] != '\0' && line_count < 3; i++) {
+        if (keyboard_name[i] == ' ') {
+            keyboard_name[i]       = '\0';
+            name_lines[line_count] = &keyboard_name[i + 1];
+            line_count++;
+        }
+    }
+    drawtext_centered(surface, 0, 26, LCD_WIDTH, pixellari_18, "PRODUCT");
+    uint16_t name_top = 47 + (61 - line_count * pixellari_18->line_height) / 2;
+    for (uint8_t i = 0; i < line_count; i++) {
+        drawtext_centered_recolor(surface, 0, name_top + i * pixellari_18->line_height, LCD_WIDTH, pixellari_18, name_lines[i], ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
+    }
+    char build_date[] = QMK_BUILDDATE;
+    build_date[10]    = '\0';
+    drawtext_centered(surface, 0, 135, LCD_WIDTH, pixellari_18, "BUILD DATE");
+    drawtext_centered_recolor(surface, 0, 155, LCD_WIDTH, pixellari_18, build_date, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
+    drawtext_centered(surface, 0, 184, LCD_WIDTH, pixellari_18, "COMMIT");
+    drawtext_centered_recolor(surface, 0, 204, LCD_WIDTH, pixellari_18, QMK_GIT_HASH, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
+}
+
 __attribute__((weak)) painter_rotation_t get_display_rotation(void) {
     return QP_ROTATION_0;
 }
@@ -328,7 +357,13 @@ void display_init_kb(void) {
 
     ui_hsv = last_hsv;
 
-    display_ui_init();
+    if (is_keyboard_master()) {
+        splash_active = true;
+        splash_start  = timer_read32();
+        display_splash_init();
+    } else {
+        display_ui_init();
+    }
 
     qp_surface_draw(surface, lcd, LCD_OFFSET_X, LCD_OFFSET_Y, false);
 
@@ -342,6 +377,14 @@ __attribute__((weak)) bool display_task_user(void) {
 void display_task_kb(void) {
     if (!display_task_user()) {
         return;
+    }
+
+    if (splash_active) {
+        if (timer_elapsed32(splash_start) < LCD_SPLASH_DURATION) {
+            return;
+        }
+        splash_active = false;
+        display_ui_init();
     }
 
     if (last_hsv.h != rgb_matrix_get_hue() || last_hsv.s != rgb_matrix_get_sat()) {
