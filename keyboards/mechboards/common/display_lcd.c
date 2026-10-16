@@ -24,7 +24,7 @@
 #    define LCD_OFFSET_Y 40
 #endif
 
-static uint8_t surface_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(LCD_WIDTH, LCD_HEIGHT, 16)];
+__attribute__((aligned(4))) static uint8_t surface_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(LCD_WIDTH, LCD_HEIGHT, 16)];
 
 painter_device_t      lcd;
 painter_device_t      surface __attribute__((used));
