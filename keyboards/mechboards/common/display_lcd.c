@@ -342,7 +342,7 @@ void display_splash_init(void) {
     }
     char build_date[] = QMK_BUILDDATE;
     build_date[10]    = '\0';
-    drawtext_centered(surface, 0, 135, LCD_WIDTH, pixellari_18, "BUILD DATE");
+    drawtext_centered(surface, 0, 135, LCD_WIDTH, pixellari_18, "COMPILE DATE");
     drawtext_centered_recolor(surface, 0, 155, LCD_WIDTH, pixellari_18, build_date, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
     drawtext_centered(surface, 0, 184, LCD_WIDTH, pixellari_18, "COMMIT");
     drawtext_centered_recolor(surface, 0, 204, LCD_WIDTH, pixellari_18, QMK_GIT_HASH, ui_hsv.h, ui_hsv.s, ui_hsv.v, 0, 0, 0);
