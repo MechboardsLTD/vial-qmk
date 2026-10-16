@@ -351,22 +351,6 @@ void display_task_kb(void) {
         display_ui_init();
     }
 
-    if (is_keyboard_master()) {
-        static uint8_t last_bl = 255;
-
-        if (last_input_activity_elapsed() > QUANTUM_PAINTER_DISPLAY_TIMEOUT) {
-            if (last_bl == 255) {
-                last_bl = get_backlight_level();
-            }
-            backlight_level_noeeprom(0);
-        } else {
-            if (last_bl != 255) {
-                backlight_level_noeeprom(last_bl);
-            }
-            last_bl = 255;
-        }
-    }
-
     static uint32_t timer = 0;
 
     if (is_keyboard_left()) {
